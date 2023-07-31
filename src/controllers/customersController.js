@@ -37,6 +37,9 @@ export async function getCustomerById(req, res){
 
     try{
         const customers = await db.query(`SELECT * FROM customers WHERE id=$1;`, [id]);
+        if(!customers.rows[0]){
+            res.sendStatus(404);
+        }
         const customer = customers.rows.map((c) => {
             return {
                 id: c.id,
