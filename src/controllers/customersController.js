@@ -56,7 +56,7 @@ export async function updateCustomer(req, res){
     const {name, phone, cpf, birthday} = req.body;
 
     try{
-        const customers = await (await db.query(`SELECT * FROM customers`)).rows;
+        const customers = await db.query(`SELECT * FROM customers`).rows;
         const verificarCpf = customers.find((c) => c.cpf == cpf);
         if(verificarCpf){
             if(verificarCpf.id != id){
