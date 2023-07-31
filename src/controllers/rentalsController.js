@@ -64,20 +64,22 @@ export async function postRentals(req, res) {
         if(!customer.rows[0]){
             return res.sendStatus(400);
         }
-    
-        const game = await db.query(`SELECT * FROM games WHERE id=$1;`, [gameId]);
-        if(!game.rows[0]){
+        
+        const games = await db.query(`SELECT * FROM games WHERE id=$1;`, [gameId]);
+        const game = games.rows[0];
+        console.log(games, game, "here");
+        if(!game){
             return res.sendStatus(400);
         }
 
         const gamesRented = await db.query(`SELECT * FROM rentals WHERE "gameId"=$1;`, [gameId]);
-
+        console.log(gamesRented.rows.length, game.stockTotal, "aQui");
         if (gamesRented.rows.length == game.stockTotal) {
             return res.status(400).send("Todos as unidades do jogo escolhido já estão alugadas");
         }
 
         const today = dayjs().format('YYYY-MM-DD');
-        const price = Number(daysRented) * Number(game.rows[0].pricePerDay);
+        const price = Number(daysRented) * Number(game.pricePerDay);
 
         const rental = {
             customerId: customerId,

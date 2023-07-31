@@ -1,4 +1,5 @@
 import { db } from "../database/databaseConnection.js";
+import dayjs from "dayjs";
 
 /* clientes
     {
@@ -14,7 +15,16 @@ export async function getCustomers(req, res){
 
     try{
         const customers = await db.query(`SELECT * FROM customers;`);
-        res.status(200).send(customers.rows);
+        const listCustomers = customers.rows.map((c) => {
+            return {
+                id: c.id,
+                name: c.name,
+                phone: c.phone,
+                cpf: c.cpf,
+                birthday: dayjs(c.birthday).format('YYYY-MM-DD')
+            }
+        })
+        res.status(200).send(listCustomers);
     }catch (err) {
         res.status(500).send(err.message);
     }
@@ -26,8 +36,17 @@ export async function getCustomerById(req, res){
     const {id} = req.params;
 
     try{
-        const customer = await db.query(`SELECT * FROM customers WHERE id=$1;`, [id]);
-        res.status(200).send(customer.rows[0]);
+        const customers = await db.query(`SELECT * FROM customers WHERE id=$1;`, [id]);
+        const customer = customers.rows.map((c) => {
+            return {
+                id: c.id,
+                name: c.name,
+                phone: c.phone,
+                cpf: c.cpf,
+                birthday: dayjs(c.birthday).format('YYYY-MM-DD')
+            }
+        })
+        res.status(200).send(customer[0]);
     }catch (err) {
         res.status(500).send(err.message);
     }
@@ -56,8 +75,8 @@ export async function updateCustomer(req, res){
     const {name, phone, cpf, birthday} = req.body;
 
     try{
-        const customers = await db.query(`SELECT * FROM customers`).rows;
-        const verificarCpf = customers.find((c) => c.cpf == cpf);
+        const customers = await db.query(`SELECT * FROM customers`);
+        const verificarCpf = customers.rows.find((c) => c.cpf == cpf);
         if(verificarCpf){
             if(verificarCpf.id != id){
                 return res.status(409).send("Cpf já cadastrado em outro cliente");
