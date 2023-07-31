@@ -28,8 +28,7 @@ export async function postGame(req, res){
     try{
 
         const game = await db.query(`SELECT * FROM games WHERE name=$1`, [name]);
-        if(game){
-            console.log("O jogo já existe");
+        if(game.rows.length > 0){
             return res.status(409).send("O jogo já existe");
         }
 
